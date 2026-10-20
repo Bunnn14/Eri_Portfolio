@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Erien Amamiya — Cosplayer &amp; Game Streamer | @eerie_miya</title>
+<meta name="description" content="Personal portfolio of Erien Amamiya (@eerie_miya) — Filipina cosplayer and game streamer, Asuka Kazama (Tekken) main. Cosplay gallery, streams, sponsorships and collabs.">
+<meta name="theme-color" content="#07070f">
+<meta property="og:title" content="Erien Amamiya — Cosplayer &amp; Game Streamer">
+<meta property="og:description" content="Welcome to my Cult. 🎮 Game Streamer | Cosplayer. Asuka Kazama main.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/img/profile.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23ff2e88'/><rect x='3' y='3' width='10' height='10' fill='%2307070f'/><rect x='6' y='6' width='4' height='4' fill='%2322e6ff'/></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-palette="asuka">
+
+<!-- ============ CRT OVERLAYS ============ -->
+<div class="crt-lines" aria-hidden="true"></div>
+<div class="crt-vignette" aria-hidden="true"></div>
+<a class="skip-link" href="#main">SKIP TO CONTENT</a>
+
+<!-- ============ BOOT SCREEN ============ -->
+<div class="boot" id="boot">
+  <div class="boot__inner">
+    <p class="boot__logo">ERIEN<br>ARCADE</p>
+    <p class="boot__line" id="bootLine">SYSTEM BOOT…</p>
+    <div class="boot__bar"><span id="bootBar"></span></div>
+    <button class="boot__skip" id="bootSkip" type="button">PRESS ANY KEY TO SKIP</button>
+  </div>
+</div>
+
+<!-- ============ TOP BAR ============ -->
+<div class="scroll-health" aria-hidden="true"><span id="scrollHealth"></span></div>
+
+<header class="topbar" id="topbar">
+  <a class="topbar__logo" href="#home">
+    <span class="topbar__p1">P1</span>
+    <span class="topbar__name">ERIEN<span class="topbar__dot">_</span>AMAMIYA</span>
+  </a>
+
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    <ul class="nav__list">
+      <li><a class="nav__link is-active" href="#home" data-nav="home">HOME</a></li>
+      <li><a class="nav__link" href="#about" data-nav="about">ABOUT</a></li>
+      <li><a class="nav__link" href="#gallery" data-nav="gallery">GALLERY</a></li>
+      <li><a class="nav__link" href="#videos" data-nav="videos">VIDEOS</a></li>
+      <li><a class="nav__link" href="#schedule" data-nav="schedule">SCHEDULE</a></li>
+      <li><a class="nav__link" href="#socials" data-nav="socials">SOCIALS</a></li>
+      <li><a class="nav__link" href="#contact" data-nav="contact">CONTACT</a></li>
+    </ul>
+  </nav>
+
+  <div class="topbar__hud">
+    <div class="coins" title="Sections discovered">
+      <span class="coins__icon" aria-hidden="true">◆</span>
+      <span id="coinCount">00</span>
+    </div>
+    <button class="iconbtn" id="soundToggle" type="button" aria-pressed="false" title="Toggle sound">♪</button>
+    <button class="iconbtn menubtn" id="menuToggle" type="button" aria-expanded="false" aria-controls="nav" title="Menu">≡</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="home">
+  <div class="hero__stage">
+    <canvas id="asuka" class="hero__canvas" aria-label="Interactive 3D pixel model of Erien as Asuka Kazama"></canvas>
+    <span class="hero__stagetag">3D // ASUKA KAZAMA</span>
+  </div>
+
+  <div class="hero__content">
+    <p class="hero__kicker" id="heroKicker">PLAYER 1 // @eerie_miya</p>
+    <h1 class="hero__title glitch" data-text="ERIEN AMAMIYA">ERIEN AMAMIYA</h1>
+    <p class="hero__typewriter"><span id="typeLine"></span><span class="caret">█</span></p>
+    <p class="hero__intro" id="heroIntro"></p>
+
+    <ul class="hero__stats" id="heroStats"></ul>
+
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="#contact" id="heroCtaPrimary">INSERT COIN</a>
+      <a class="btn" href="#gallery" id="heroCtaSecondary">VIEW GALLERY</a>
+      <a class="btn btn--ghost" href="https://www.tiktok.com/@eerie_miya" target="_blank" rel="noopener" id="heroCtaFollow">FOLLOW ↗</a>
+    </div>
+
+    <p class="hero__hint" id="heroHint">DRAG THE MODEL TO ROTATE · CLICK HER TO PARRY</p>
+  </div>
+
+  <div class="hero__controls">
+    <button class="btn btn--small" id="btnAttack" type="button">ATTACK!</button>
+    <button class="btn btn--small btn--ghost" id="btnPose" type="button">POSE</button>
+  </div>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track" id="tickerTrack"></div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="section" id="about">
+  <div class="section__head">
+    <span class="section__num" data-secnum="about">01</span>
+    <h2 class="section__title" data-reveal data-sectitle="about">PLAYER PROFILE</h2>
+  </div>
+
+  <figure class="banner" data-reveal>
+    <img src="assets/img/cover.jpg" alt="Erien Amamiya — streamer and content creator" loading="lazy" id="bannerImg">
+    <figcaption id="bannerCaption">ERIEN AMAMIYA · STREAMER / CONTENT CREATOR</figcaption>
+    <span class="panel__corner panel__corner--tl"></span><span class="panel__corner panel__corner--br"></span>
+  </figure>
+
+  <div class="about">
+    <figure class="about__portrait panel" data-reveal>
+      <div class="about__frame">
+        <img src="assets/img/profile.jpg" alt="Portrait of Erien Amamiya" loading="lazy" id="portrait">
+      </div>
+      <figcaption>
+        <strong id="portraitName">ERIEN AMAMIYA</strong>
+        <span id="portraitMeta">@eerie_miya · MANILA, PH</span>
+      </figcaption>
+      <span class="panel__corner panel__corner--tl"></span><span class="panel__corner panel__corner--br"></span>
+    </figure>
+
+    <div class="about__bio" data-reveal>
+      <p class="about__lead" id="aboutLead"></p>
+      <div id="aboutParas"></div>
+      <ul class="about__facts" id="aboutFacts"></ul>
+    </div>
+
+    <div class="about__skills panel" data-reveal>
+      <h3 class="panel__title">STATS</h3>
+      <ul class="skills" id="skills"></ul>
+      <span class="panel__corner panel__corner--tl"></span><span class="panel__corner panel__corner--br"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="section" id="gallery">
+  <div class="section__head">
+    <span class="section__num" data-secnum="gallery">02</span>
+    <h2 class="section__title" data-reveal data-sectitle="gallery">COSPLAY GALLERY</h2>
+  </div>
+
+  <div class="filters" id="filters" role="tablist" aria-label="Gallery filters"></div>
+  <div class="grid" id="grid"></div>
+  <p class="grid__empty" id="gridEmpty" hidden>NO PHOTOS IN THIS LEVEL.</p>
+</section>
+
+<!-- ============ VIDEOS ============ -->
+<section class="section" id="videos">
+  <div class="section__head">
+    <span class="section__num" data-secnum="videos">03</span>
+    <h2 class="section__title" data-reveal data-sectitle="videos">FEATURED CONTENT</h2>
+  </div>
+  <p class="section__sub" id="videosNote"></p>
+  <div class="cabs" id="cabs"></div>
+</section>
+
+<!-- ============ SCHEDULE ============ -->
+<section class="section" id="schedule">
+  <div class="section__head">
+    <span class="section__num" data-secnum="schedule">04</span>
+    <h2 class="section__title" data-reveal data-sectitle="schedule">STREAM SCHEDULE</h2>
+  </div>
+
+  <div class="schedule__top">
+    <div class="live" id="liveBadge">
+      <span class="live__dot"></span>
+      <span id="liveText">CHECKING STREAM STATUS…</span>
+    </div>
+    <div class="countdown panel">
+      <span class="panel__title">NEXT STREAM IN</span>
+      <strong id="countdown">--:--:--</strong>
+      <span class="countdown__tz" id="tzLabel"></span>
+    </div>
+  </div>
+
+  <div class="week" id="week"></div>
+  <p class="note" id="scheduleNote">* Schedule is a placeholder — update it in the CMS (admin.html) with the real stream times.</p>
+</section>
+
+<!-- ============ SOCIAL LINKS ============ -->
+<section class="section" id="socials">
+  <div class="section__head">
+    <span class="section__num" data-secnum="socials">05</span>
+    <h2 class="section__title" data-reveal data-sectitle="socials">SOCIAL LINKS</h2>
+  </div>
+  <p class="section__sub" id="socialsSub">EVERY PORTAL TO FIND ME — PICK YOUR PLAYER</p>
+
+  <div class="reach" data-reveal>
+    <div class="reach__tally">
+      <span class="reach__label">TOTAL REACH</span>
+      <strong class="reach__num" id="reachTotal">—</strong>
+      <span class="reach__unit" id="reachUnit">FOLLOWERS ACROSS PLATFORMS</span>
+    </div>
+    <div class="reach__acts">
+      <button class="btn btn--small" id="copyMail" type="button">COPY EMAIL</button>
+      <a class="btn btn--small btn--primary" id="reachMail" href="mailto:eriamamiya@gmail.com">OPEN MAIL ↗</a>
+    </div>
+    <span class="panel__corner panel__corner--tl"></span><span class="panel__corner panel__corner--br"></span>
+  </div>
+
+  <div class="socials" id="socialsGrid"></div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section" id="contact">
+  <div class="section__head">
+    <span class="section__num" data-secnum="contact">06</span>
+    <h2 class="section__title" data-reveal data-sectitle="contact" id="contactTitle">INSERT COIN TO COLLAB</h2>
+  </div>
+
+  <div class="contact">
+    <form class="contact__form panel" id="contactForm" novalidate>
+      <span class="panel__corner panel__corner--tl"></span><span class="panel__corner panel__corner--br"></span>
+
+      <label class="field">
+        <span>YOUR NAME / BRAND</span>
+        <input type="text" name="name" required autocomplete="name" placeholder="PLAYER NAME">
+      </label>
+      <label class="field">
+        <span>EMAIL</span>
+        <input type="email" name="email" required autocomplete="email" placeholder="YOU@EXAMPLE.COM">
+      </label>
+      <label class="field">
+        <span>COLLAB TYPE</span>
+        <select name="subject" id="contactSubject"></select>
+      </label>
+      <label class="field">
+        <span>MESSAGE</span>
+        <textarea name="message" rows="5" required placeholder="TELL ME THE QUEST…"></textarea>
+      </label>
+      <button class="btn btn--primary btn--block" type="submit">SEND TRANSMISSION</button>
+      <p class="field__msg" id="formMsg" role="status"></p>
+    </form>
+
+    <aside class="contact__side" data-reveal>
+      <div class="panel">
+        <h3 class="panel__title" id="directTitle">DIRECT LINE</h3>
+        <a class="contact__mail" id="contactMail" href="#">eriamamiya@gmail.com</a>
+        <p class="contact__blurb" id="contactBlurb"></p>
+      </div>
+      <div class="panel">
+        <h3 class="panel__title" id="partnerTitle">PARTNERED WITH</h3>
+        <p class="contact__brand" id="partnerName">🐉 REDRAGON PHILIPPINES</p>
+        <p class="contact__blurb" id="partnerBlurb">Sponsored gear — Lakshmi K606R mechanical keyboard.</p>
+      </div>
+      <div class="panel">
+        <h3 class="panel__title" id="supportTitle">SUPPORT THE STREAM</h3>
+        <p class="contact__blurb" id="supportBlurb">Gank memberships, tips and locked photosets.</p>
+        <a class="btn btn--small" id="supportLink" href="https://ganknow.com/eeri3miya" target="_blank" rel="noopener">VISIT GANK ↗</a>
+      </div>
+    </aside>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <p class="footer__big" id="footerBig">GAME OVER?</p>
+  <p>© <span id="year"></span> <span id="footerLine">ERIEN AMAMIYA · @eerie_miya · ALL RIGHTS RESERVED</span></p>
+  <p class="footer__small" id="footerSmall">Photos © Erien Amamiya. Built as a pixel-arcade fan/portfolio site.</p>
+  <button class="btn btn--small" id="toTop" type="button">PRESS ↑ TO CONTINUE</button>
+</footer>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lb" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
+  <button class="lb__close" id="lbClose" type="button" aria-label="Close">✕</button>
+  <button class="lb__nav lb__nav--prev" id="lbPrev" type="button" aria-label="Previous">◀</button>
+  <figure class="lb__fig">
+    <img id="lbImg" alt="">
+    <figcaption><strong id="lbTitle"></strong><span id="lbCap"></span></figcaption>
+  </figure>
+  <button class="lb__nav lb__nav--next" id="lbNext" type="button" aria-label="Next">▶</button>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="assets/vendor/three.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/asuka3d.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
