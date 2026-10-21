@@ -438,26 +438,26 @@
     var i;
 
     /* wall: gentle vertical gradient */
-    var shades = ["#1c1530", "#191229", "#151022", "#120d1d", "#0f0b18"];
+    var shades = ["#191b20", "#16181d", "#131519", "#101216", "#0d0f12"];
     for (i = 0; i < 5; i++) {
       var y0 = Math.round(deskTop * i / 5), y1 = Math.round(deskTop * (i + 1) / 5);
       g.fillStyle = shades[i];
       g.fillRect(0, y0, w, y1 - y0);
     }
 
-    /* RGB corner glow — magenta left, cyan right */
+    /* Subdued violet and electric-blue corner lighting */
     var r1 = Math.max(6, Math.min(w, deskTop) * 0.30);
-    disc(g, w * 0.18, deskTop * 0.52, r1, "#241544");
-    disc(g, w * 0.18, deskTop * 0.52, r1 * 0.62, "#3a2170");
+    disc(g, w * 0.18, deskTop * 0.52, r1, "#191b20");
+    disc(g, w * 0.18, deskTop * 0.52, r1 * 0.62, "#332844");
     var r2 = Math.max(5, Math.min(w, deskTop) * 0.26);
-    disc(g, w * 0.82, deskTop * 0.45, r2, "#0f1d38");
-    disc(g, w * 0.82, deskTop * 0.45, r2 * 0.6, "#153358");
+    disc(g, w * 0.82, deskTop * 0.45, r2, "#14171c");
+    disc(g, w * 0.82, deskTop * 0.45, r2 * 0.6, "#1d3554");
 
     /* LED strip across the wall behind her */
     var stripY = Math.round(deskTop * 0.34);
     var seg = reduced ? 0 : Math.floor(t) % 2;
     for (var x = 1; x < w - 1; x += 3) {
-      g.fillStyle = (((x / 3) | 0) + seg) % 2 ? "#6f3fb5" : "#2f5fbe";
+      g.fillStyle = (((x / 3) | 0) + seg) % 2 ? "#593849" : "#355985";
       g.fillRect(x, stripY, 2, 1);
     }
 
@@ -466,13 +466,13 @@
     var monH = Math.round(monW * 0.72) + 3;
     var mx = 1, my = deskTop - monH;
     if (my < 0) my = 0;
-    g.fillStyle = "#0e0d16"; g.fillRect(mx, my, monW, monH);          /* bezel */
-    g.fillStyle = "#16243c"; g.fillRect(mx + 1, my + 1, monW - 2, monH - 2);  /* screen */
-    g.fillStyle = "#29486b";                                            /* chat lines */
+    g.fillStyle = "#0e0f12"; g.fillRect(mx, my, monW, monH);          /* bezel */
+    g.fillStyle = "#181a1f"; g.fillRect(mx + 1, my + 1, monW - 2, monH - 2);  /* screen */
+    g.fillStyle = "#424852";                                            /* chat lines */
     g.fillRect(mx + 2, my + 3, Math.max(2, monW - 8), 1);
     g.fillRect(mx + 2, my + 5, Math.max(2, monW - 12), 1);
     g.fillRect(mx + 2, my + 7, Math.max(2, monW - 9), 1);
-    g.fillStyle = "#5f9fff";                                            /* accent bar */
+    g.fillStyle = "#3b82f6";                                            /* accent bar */
     g.fillRect(mx + 2, my + monH - 4, Math.max(2, monW - 10), 1);
     g.fillStyle = "#ff5461";                                            /* live dot */
     g.fillRect(mx + monW - 4, my + 2, 2, 2);
@@ -483,18 +483,18 @@
     var micX = w - micW - clamp(Math.round(w * 0.06), 3, 9);
     var micTop = deskTop - micH - clamp(Math.round(deskTop * 0.18), 3, 10);
     /* boom arm coming in from the top right */
-    g.fillStyle = "#2d2740";
+    g.fillStyle = "#292c32";
     var ax = w - 2, ay = Math.round(micTop * 0.45), bx = micX + micW - 1, by2 = micTop;
     var steps = Math.max(1, Math.max(Math.abs(bx - ax), Math.abs(by2 - ay)));
     for (i = 0; i <= steps; i++) {
       g.fillRect(Math.round(ax + (bx - ax) * i / steps), Math.round(ay + (by2 - ay) * i / steps), 1, 1);
     }
     /* capsule */
-    g.fillStyle = "#3b3549"; g.fillRect(micX, micTop, micW, micH);
-    g.fillStyle = "#575070";                                           /* grille */
+    g.fillStyle = "#383c43"; g.fillRect(micX, micTop, micW, micH);
+    g.fillStyle = "#626873";                                           /* grille */
     g.fillRect(micX, micTop + 1, micW, 1);
     g.fillRect(micX, micTop + (micH >> 1), micW, 1);
-    g.fillStyle = "#b061ff";                                           /* RGB ring */
+    g.fillStyle = "#8759c3";                                           /* RGB ring */
     g.fillRect(micX, micTop + micH - 2, micW, 1);
     g.fillStyle = "#ff4d5e";                                           /* rec dot */
     g.fillRect(micX + (micW >> 1), micTop - 1, 1, 1);
@@ -503,16 +503,16 @@
   /* desk in FRONT of her (she sits behind it) + keyboard with RGB */
   function drawDesk(g, w, h, deskTop, OX) {
     if (deskTop < 4 || w <= 2) return;
-    g.fillStyle = "#221830";
+    g.fillStyle = "#202228";
     g.fillRect(0, deskTop, w, h - deskTop);
-    g.fillStyle = "#3a2b52";
+    g.fillStyle = "#343840";
     g.fillRect(0, deskTop, w, 1);
     var kw = 14, kx = OX + 16 - (kw >> 1);
-    g.fillStyle = "#15111e";
+    g.fillStyle = "#141619";
     g.fillRect(kx, deskTop + 1, kw, 2);
-    g.fillStyle = "#ff4757"; g.fillRect(kx + 2, deskTop + 1, 1, 1);
-    g.fillStyle = "#4f92ff"; g.fillRect(kx + 7, deskTop + 1, 1, 1);
-    g.fillStyle = "#b061ff"; g.fillRect(kx + 11, deskTop + 1, 1, 1);
+    g.fillStyle = "#ef4052"; g.fillRect(kx + 2, deskTop + 1, 1, 1);
+    g.fillStyle = "#3b82f6"; g.fillRect(kx + 7, deskTop + 1, 1, 1);
+    g.fillStyle = "#8759c3"; g.fillRect(kx + 11, deskTop + 1, 1, 1);
   }
 
   /* ----------------------------- particles ------------------------------- */
@@ -537,14 +537,14 @@
       if (p.life <= 0) { parts.splice(i, 1); continue; }
       var x = Math.round(p.x), y = Math.round(p.y);
       if (p.k === "heart") {
-        g.fillStyle = "#ff4757";
+        g.fillStyle = "#ef4052";
         g.fillRect(x, y, 1, 1); g.fillRect(x + 2, y, 1, 1);
         g.fillRect(x, y + 1, 3, 1); g.fillRect(x + 1, y + 2, 1, 1);
       } else if (p.k === "spark") {
-        g.fillStyle = p.life > 0.5 ? "#6aa8ff" : "#ffffff";
+        g.fillStyle = p.life > 0.5 ? "#5596ff" : "#ffffff";
         g.fillRect(x + 1, y, 1, 1); g.fillRect(x, y + 1, 3, 1); g.fillRect(x + 1, y + 2, 1, 1);
       } else {
-        g.fillStyle = p.life > 0.5 ? "#c08bff" : "#ffffff";
+        g.fillStyle = p.life > 0.5 ? "#a855f7" : "#ffffff";
         g.fillRect(x, y, 1, 1); g.fillRect(x - 2, y, 1, 1); g.fillRect(x + 2, y, 1, 1);
         g.fillRect(x, y - 2, 1, 1); g.fillRect(x, y + 2, 1, 1);
       }
