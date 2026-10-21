@@ -21,7 +21,7 @@
 
   content.then(function (remoteContent) {
     if (remoteContent) window.SITE = remoteContent;
-    return loadScript("js/pixel.js?v=20261021e")
+    return loadScript("js/pixel.js?v=20261021f")
       .then(function () { return loadScript("js/main.js?v=20261021e"); });
   }).catch(function (error) {
     console.error("The site could not finish loading its scripts.", error);

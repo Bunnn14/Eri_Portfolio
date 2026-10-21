@@ -307,9 +307,9 @@
       var pv = document.createElement("div");
       pv.className = "avprev";
       pv.innerHTML =
-        '<span class="fld__lab">LIVE PREVIEW <em>hero.avatar</em></span>' +
+        '<span class="fld__lab">Character preview</span>' +
         '<canvas class="avprev__cv" id="avPreview" width="64" height="80"></canvas>' +
-        '<p class="fld__help">Exactly how she looks on the homepage right now. Change the options below, then press SAVE and reload the site.</p>';
+        '<p class="fld__help">This is how the character will look on the homepage. Save and reload the site to see your changes.</p>';
       sec.appendChild(pv);
       sec.addEventListener("change", function () { requestAnimationFrame(renderAvatarPreview); });
     }
@@ -415,7 +415,7 @@
     var inp = document.createElement("input");
     inp.type = "text";
     inp.value = path;
-    inp.placeholder = "assets/img/photo1.jpg";
+    inp.placeholder = "Paste an image address";
     inp.addEventListener("input", function () {
       setter(inp.value.trim());
       prev.style.backgroundImage = inp.value ? "url('" + inp.value + "')" : "none";
@@ -429,7 +429,7 @@
     var pick = document.createElement("button");
     pick.type = "button";
     pick.className = "btn btn--sm";
-    pick.textContent = "CHOOSE FILE";
+    pick.textContent = "CHOOSE IMAGE";
     row.appendChild(pick);
 
     var file = document.createElement("input");
@@ -517,7 +517,7 @@
 
     var lab = document.createElement("label");
     lab.className = "fld__lab";
-    lab.innerHTML = esc(spec.label) + (spec.path ? ' <em>' + esc(spec.path) + "</em>" : "");
+    lab.textContent = spec.label;
     row.appendChild(lab);
 
     row.appendChild(buildControl(spec,
@@ -573,7 +573,7 @@
       var items = arr();
       var count = document.createElement("p");
       count.className = "obj__count";
-      count.textContent = items.length + (items.length === 1 ? " ITEM" : " ITEMS");
+      count.textContent = items.length + (items.length === 1 ? " item" : " items");
       body.appendChild(count);
 
       items.forEach(function (item, i) {
@@ -598,7 +598,7 @@
             if (a[0] === "up" && i > 0) { xs.splice(i - 1, 0, xs.splice(i, 1)[0]); }
             if (a[0] === "down" && i < xs.length - 1) { xs.splice(i + 1, 0, xs.splice(i, 1)[0]); }
             if (a[0] === "del") {
-              if (!window.confirm("DELETE “" + title + "”?")) return;
+              if (!window.confirm("Remove “" + title + "”?")) return;
               xs.splice(i, 1);
             }
             markDirty();
