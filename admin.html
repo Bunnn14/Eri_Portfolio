@@ -43,11 +43,11 @@
     <div class="cmsbar__acts">
       <span class="dirty" id="dirtyDot"><i></i>UNSAVED</span>
       <span class="savedat" id="savedAt"></span>
-      <button class="btn btn--sm" id="btnReload" type="button" title="Throw away edits and re-read js/data.js">RELOAD</button>
+      <button class="btn btn--sm" id="btnReload" type="button" title="Throw away edits and re-read saved content">RELOAD</button>
       <button class="btn btn--sm" id="btnView" type="button" title="Open the live site in a new tab">VIEW SITE ↗</button>
       <button class="btn btn--sm" id="btnDownload" type="button" title="Download data.js (works without the server)">DOWNLOAD</button>
       <button class="btn btn--sm" id="btnPassword" type="button" title="Change the set password (master key stays)">PASSWORD</button>
-      <button class="btn btn--sm btn--primary" id="btnSave" type="button" title="Save to js/data.js (Ctrl+S)">SAVE</button>
+      <button class="btn btn--sm btn--primary" id="btnSave" type="button" title="Save content (Ctrl+S)">SAVE</button>
       <button class="btn btn--sm btn--ghost" id="btnLogout" type="button">LOGOUT</button>
     </div>
   </header>
@@ -57,8 +57,8 @@
   <main id="panels"></main>
 
   <footer class="cmsfoot">
-    <p>Content lives in <code>js/data.js</code> — the CMS rewrites it as plain JSON you can still edit by hand.
-       Run <code>python serve.py</code> for direct saving and photo uploads; every save keeps a <code>data.js.bak</code> backup.</p>
+    <p>Content is saved to Supabase, or to <code>js/data.js</code> when using the local server.
+       Run <code>python serve.py</code> for local saving and photo uploads; local saves keep a <code>data.js.bak</code> backup.</p>
   </footer>
 </div>
 
@@ -92,6 +92,8 @@
 <script src="js/auth.js"></script>
 <script src="js/cms-schema.js?v=20261021b"></script>
 <script src="js/pixel.js?v=20261021d"></script>
+<script src="js/supabase-config.js?v=20261021"></script>
+<script src="js/supabase.js?v=20261021"></script>
 <script src="js/admin.js?v=20261021"></script>
 </body>
 </html>

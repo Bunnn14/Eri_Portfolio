@@ -4,8 +4,9 @@ A dark, pixel-arcade styled personal portfolio for cosplayer & game streamer
 **Erien Amamiya** ([@eerie_miya](https://www.tiktok.com/@eerie_miya)).
 
 Static site — **no build step, no dependencies to install.** Plain HTML/CSS/JS
-with a hand-made pixel chibi hero (drawn on canvas, no libraries). A bundled
-Python script adds an optional admin CMS on top.
+with a hand-made pixel chibi hero (drawn on canvas, no libraries). The CMS can
+use Supabase for hosted content and images, or the bundled Python script for
+local-only editing.
 
 ---
 
@@ -17,7 +18,7 @@ Python script adds an optional admin CMS on top.
 python -m http.server 8000     # then open http://localhost:8000
 ```
 
-**Site + admin CMS** (recommended for editing):
+**Site + local admin CMS**:
 
 ```bash
 python serve.py                # site on :8765, admin on :8765/admin.html
@@ -41,6 +42,31 @@ the master key shows a *"MASTER KEY USED"* warning so you know.)
 > with `serve.py` inside it** — ship only the static files (see *Deploying*
 > below). Anyone who can read `serve.py` or `js/auth.js` can see the hashes.
 
+### ☁️ Supabase database and image storage
+
+The CMS can save all editable text, links, schedule, avatar settings and image
+paths to Supabase. Uploaded images are stored in a public Supabase Storage
+bucket; the current images bundled in `assets/img/` continue to work as-is.
+
+1. In Supabase, create an **Authentication user** for the CMS (email/password).
+   Disable public sign-ups in Authentication settings.
+2. Open `supabase/schema.sql`, replace
+   `replace-with-your-admin-email@example.com` with that user's email, then run
+   the full script in the Supabase **SQL Editor**.
+3. Copy the project's URL and **anon/public key** from Project Settings → API
+   into `url` and `anonKey` in `js/supabase-config.js`; set `adminEmail` to the
+   same user's email. The anon key is intended for browser use; never put a
+   service-role key in this file.
+4. Host the project on a web server (for example `python -m http.server 8000`)
+   and open `/admin.html`. Sign in using the Supabase user's password. If the
+   database has no content row yet, the CMS loads the bundled `js/data.js`;
+   press **SAVE** once to seed Supabase with that content.
+
+The SQL script grants public read access only to the website content and
+published images. Only the Supabase user registered in `cms_admins` can edit
+content or upload/list images. The existing `python serve.py` mode remains
+available when Supabase is not configured.
+
 Everything (fonts, photos, pixel art) is bundled locally, so the site works
 offline and can be dropped straight onto Netlify, GitHub Pages, Vercel, or any
 host.
@@ -62,24 +88,25 @@ a live preview.
 python serve.py        →  http://localhost:8765/admin.html
 ```
 
-- **Save** writes straight back to `js/data.js` (a `data.js.bak` backup is kept
-  before every save).
-- **Photo uploads** land in `assets/img/`; you can also pick any image already
-  there.
+- With Supabase configured, **Save** updates the `site_content` database row
+  and uploads go to Supabase Storage.
+- With `python serve.py`, **Save** writes `js/data.js` (with a `data.js.bak`
+  backup), and photo uploads land in `assets/img/`.
+- You can pick bundled images or images already in the Supabase bucket.
 - Field types: text, multi-line, numbers, on/off switches, list-of-strings
   (one per line) and repeatable cards with ↑ ↓ ✕ and an *add* button.
 - `Ctrl+S` saves. A purple **UNSAVED** light warns you about unsaved edits.
 
-Without `serve.py` running — opened from `file://` or any plain static host —
+Without a backend configured — opened from `file://` or any plain static host —
 the CMS still works in **offline mode**: same editor, but Save hands you a
 `data.js` file to drop into `js/` yourself, and photo upload is disabled.
 
 ### 2. By hand — `js/data.js`
 
-Everything still reads from `window.SITE` in `js/data.js`; it is plain,
-commented, hand-editable JavaScript. The first CMS save rewrites it as JSON
-inside the same file — still valid JS, still readable, just without the
-inline comments (a header comment replaces them).
+The site reads its bundled fallback from `window.SITE` in `js/data.js`. When
+Supabase is configured, the latest saved `window.SITE` content is loaded from
+the database instead. The local CMS server continues to write changes to
+`js/data.js` as plain JSON.
 
 > ⚠️ Don't deploy `admin.config.json` or `serve.py` to a public host. The
 > admin page itself is fine to leave up (it is password gated) — or delete
@@ -91,16 +118,19 @@ inline comments (a header comment replaces them).
 
 ```
 index.html          markup / sections
-admin.html          CMS login + editor          (needs serve.py for saving)
+admin.html          CMS login + editor          (Supabase or serve.py)
 css/style.css       the whole arcade theme
 css/admin.css       CMS theme
-js/data.js          ← ALL SITE CONTENT LIVES HERE
+js/data.js          ← bundled fallback / initial content
 js/cms-schema.js    which fields the CMS edits
 js/admin.js         CMS logic
+js/supabase-config.js  Supabase URL, anon key and admin email
+js/supabase.js      Supabase database, auth and Storage client
+supabase/schema.sql SQL Editor setup script
 js/auth.js          password hash for the offline CMS gate (generated)
 js/pixel.js         hand-made pixel chibi hero (no libraries)
 js/main.js          UI, gallery, schedule, sfx, socials
-serve.py            local server: static files + CMS API
+serve.py            optional local server: static files + CMS API
 admin.config.json   CMS password hash + token secret (local only, generated)
 assets/img/         photos (pulled from her public pages)
 assets/fonts/       Press Start 2P · Silkscreen · VT323

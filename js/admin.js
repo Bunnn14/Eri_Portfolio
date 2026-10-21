@@ -3,11 +3,10 @@
    ----------------------------------------------------------------------------
    Schema-driven editor for window.SITE (js/data.js).
 
-   Mode 1  "SERVER"  — run `python serve.py`; Save writes js/data.js directly,
-                       photos upload into assets/img/.
-   Mode 2  "OFFLINE" — opened from file:// or a plain static host; Save gives
-                       you a data.js file to drop into js/ yourself.
-   Both modes are password gated.
+   Supabase mode — content is saved to Supabase and images to Storage.
+   Local server mode — run `python serve.py`; saves to js/data.js and uploads
+                       photos into assets/img/.
+   Offline mode — Save gives you a data.js file to drop into js/ yourself.
    ============================================================================ */
 (function () {
   "use strict";
@@ -79,6 +78,39 @@
   /* ============================ NETWORK / API ========================== */
   function api(path, opts) {
     opts = opts || {};
+    if (state.mode === "supabase") {
+      var cms = window.SupabaseCMS;
+      var operation;
+      if (path === "/api/login") {
+        operation = cms.login(opts.body.password).then(function (session) {
+          return { status: 200, json: { token: session.access_token, via: "set" } };
+        });
+      } else if (path === "/api/content") {
+        operation = cms.saveContent(opts.body.content, state.token).then(function () {
+          return { status: 200, json: { ok: true } };
+        });
+      } else if (path === "/api/assets") {
+        operation = cms.listImages(state.token).then(function (files) {
+          return { status: 200, json: { files: files } };
+        });
+      } else if (path === "/api/upload") {
+        operation = Promise.reject(new Error("Use the Supabase image uploader."));
+      } else if (path === "/api/password") {
+        operation = cms.updatePassword(opts.body.password, state.token).then(function () {
+          return { status: 200, json: { ok: true } };
+        });
+      } else {
+        operation = Promise.reject(new Error("Unsupported CMS operation."));
+      }
+      return operation.catch(function (error) {
+        if (error.status === 401) {
+          state.token = "";
+          sessionStorage.removeItem("erien_cms_token");
+        }
+        return { status: error.status || 500, json: { error: error.message } };
+      });
+    }
+
     var headers = { "Content-Type": "application/json" };
     if (state.token) headers.Authorization = "Bearer " + state.token;
     return fetch(path, {
@@ -94,6 +126,10 @@
   }
 
   function detectServer() {
+    if (window.SupabaseCMS && window.SupabaseCMS.isConfigured()) {
+      state.mode = "supabase";
+      return Promise.resolve(false);
+    }
     return fetch("api/ping", { cache: "no-store" })
       .then(function (r) { return r.json(); })
       .then(function (j) {
@@ -110,9 +146,11 @@
   function showGate(reason) {
     $("#gate").hidden = false;
     $("#app").hidden = true;
-    $("#gateMode").textContent = state.mode === "server"
-      ? "MODE: CMS SERVER (save + photo upload enabled)"
-      : "MODE: OFFLINE — edits are saved as a file you drop into js/";
+    $("#gateMode").textContent = state.mode === "supabase"
+      ? "MODE: SUPABASE (database + image storage enabled)"
+      : state.mode === "server"
+        ? "MODE: CMS SERVER (save + photo upload enabled)"
+        : "MODE: OFFLINE — edits are saved as a file you drop into js/";
     $("#gateReason").textContent = reason || "";
     setTimeout(function () { $("#gatePass").focus(); }, 60);
   }
@@ -123,6 +161,11 @@
     sessionStorage.setItem("erien_cms_token", state.token || "offline");
     renderAll();
     setStatus();
+    if (state.mode === "supabase") {
+      refreshAssets().then(function () {
+        if (!state.dirty && !$("#app").hidden) renderAll();
+      });
+    }
   }
 
   function weakHash(text) {
@@ -164,7 +207,7 @@
     if (!pw) { $("#gateErr").textContent = "ENTER THE PASSWORD."; return; }
     $("#gateErr").textContent = "";
 
-    if (state.mode === "server") {
+    if (state.mode === "server" || state.mode === "supabase") {
       api("/api/login", { body: { password: pw } }).then(function (r) {
         if (r.status === 200 && r.json.token) {
           state.token = r.json.token;
@@ -173,7 +216,9 @@
           enter();
           if (state.via === "master") toast("MASTER KEY USED — SET YOUR OWN PASSWORD (TOP BAR)", "warn");
         } else {
-          $("#gateErr").textContent = "WRONG PASSWORD.";
+          $("#gateErr").textContent = r.status === 401
+            ? "WRONG PASSWORD."
+            : "LOGIN FAILED — " + ((r.json && r.json.error) || r.status);
         }
       }).catch(function () {
         state.mode = "offline";
@@ -205,8 +250,8 @@
   function setStatus() {
     var m = $("#modeChip");
     if (!m) return;
-    m.textContent = state.mode === "server" ? "● SERVER" : "○ OFFLINE";
-    m.className = "mode mode--" + state.mode;
+    m.textContent = state.mode === "supabase" ? "● SUPABASE" : state.mode === "server" ? "● SERVER" : "○ OFFLINE";
+    m.className = "mode mode--" + (state.mode === "supabase" ? "server" : state.mode);
   }
 
   function renderTabs() {
@@ -394,8 +439,8 @@
     row.appendChild(file);
 
     pick.addEventListener("click", function () {
-      if (state.mode !== "server") {
-        toast("PHOTO UPLOAD NEEDS THE SERVER — RUN: python serve.py", "warn");
+      if (state.mode !== "server" && state.mode !== "supabase") {
+        toast("PHOTO UPLOAD NEEDS A BACKEND — CONFIGURE SUPABASE OR RUN: python serve.py", "warn");
         return;
       }
       file.click();
@@ -417,7 +462,7 @@
       var sel = document.createElement("select");
       sel.innerHTML = '<option value="">— OR PICK AN EXISTING PHOTO —</option>' +
         state.assets.map(function (a) {
-          return '<option value="' + esc(a.path) + '">' + esc(a.path.replace("assets/img/", "")) + "</option>";
+          return '<option value="' + esc(a.path) + '">' + esc(a.path.split("/").pop()) + "</option>";
         }).join("");
       sel.addEventListener("change", function () {
         if (!sel.value) return;
@@ -435,6 +480,12 @@
   }
 
   function uploadImage(file) {
+    if (state.mode === "supabase") {
+      return window.SupabaseCMS.uploadImage(file, state.token).then(function (path) {
+        state.assets.push({ path: path, size: file.size });
+        return path;
+      });
+    }
     return new Promise(function (resolve, reject) {
       var fr = new FileReader();
       fr.onerror = function () { reject("could not read file"); };
@@ -604,10 +655,24 @@
 
   /* ============================== ASSETS =============================== */
   function refreshAssets() {
-    if (state.mode !== "server") return;
-    api("/api/assets").then(function (r) {
-      if (r.status === 200 && Array.isArray(r.json.files)) state.assets = r.json.files;
-    }).catch(function () {});
+    if (state.mode === "supabase") {
+      return window.SupabaseCMS.listImages(state.token).then(function (files) {
+        state.assets = files;
+      }).catch(function (error) {
+        console.error("Could not load image choices from Supabase.", error);
+        toast("IMAGE LIST FAILED — " + error.message, "err");
+      });
+    }
+    if (state.mode !== "server") return Promise.resolve();
+    return api("/api/assets").then(function (r) {
+      if (r.status !== 200 || !Array.isArray(r.json.files)) {
+        throw new Error((r.json && r.json.error) || ("http " + r.status));
+      }
+      state.assets = r.json.files;
+    }).catch(function (error) {
+      console.error("Could not load local image choices.", error);
+      toast("IMAGE LIST FAILED — " + error.message, "err");
+    });
   }
 
   /* ================================ SAVE =============================== */
@@ -622,14 +687,14 @@
     var btn = $("#btnSave");
     btn.disabled = true;
 
-    if (state.mode === "server") {
+    if (state.mode === "server" || state.mode === "supabase") {
       api("/api/content", { body: { content: state.draft } }).then(function (r) {
         state.saving = false;
         btn.disabled = false;
         if (r.status === 200 && r.json.ok) {
           clearDirty();
           $("#savedAt").textContent = "SAVED " + new Date().toLocaleTimeString();
-          toast("SAVED TO js/data.js", "ok");
+          toast(state.mode === "supabase" ? "SAVED TO SUPABASE" : "SAVED TO js/data.js", "ok");
         } else if (r.status === 401) {
           toast("SESSION EXPIRED — LOG IN AGAIN", "warn");
           showGate("Session expired.");
@@ -694,13 +759,24 @@
     if (!SITE) { fatal("js/data.js could not be loaded — fix it first."); return; }
     if (!window.CMS_SCHEMA) { fatal("js/cms-schema.js missing."); return; }
 
-    state.draft = clone(SITE);
-
     detectServer().then(function (loggedIn) {
-      setStatus();
-      if (loggedIn) { enter(); }
-      else { showGate(); }
-      refreshAssets();
+      var content = state.mode === "supabase"
+        ? window.SupabaseCMS.readContent()
+        : Promise.resolve(null);
+      return content.then(function (remote) {
+        $("#btnReload").title = state.mode === "supabase"
+          ? "Throw away edits and re-read saved Supabase content"
+          : "Throw away edits and re-read saved content";
+        if (remote) SITE = remote;
+        state.draft = clone(SITE);
+        setStatus();
+        if (loggedIn) { enter(); }
+        else { showGate(); }
+        if (state.mode !== "supabase") refreshAssets();
+      });
+    }).catch(function (error) {
+      console.error("Could not load CMS content.", error);
+      fatal("SUPABASE CONTENT FAILED — " + error.message);
     });
   }
 
@@ -715,7 +791,7 @@
       toast("DOWNLOADED data.js", "ok");
     });
     $("#btnReload").addEventListener("click", function () {
-      if (state.dirty && !window.confirm("Discard unsaved changes and reload from disk?")) return;
+      if (state.dirty && !window.confirm("Discard unsaved changes and reload saved content?")) return;
       location.reload();
     });
     $("#btnView").addEventListener("click", function () {
@@ -735,7 +811,14 @@
       $("#pwNew").value = ""; $("#pwNew2").value = ""; $("#pwErr").textContent = "";
     }
     $("#btnPassword").addEventListener("click", function () {
-      if (state.mode !== "server") { toast("PASSWORD CHANGE NEEDS THE SERVER (python serve.py)", "warn"); return; }
+      if (state.mode !== "server" && state.mode !== "supabase") {
+        toast("PASSWORD CHANGE NEEDS AN ACTIVE BACKEND.", "warn");
+        return;
+      }
+      if (state.mode === "supabase") {
+        $("#pwTitle").textContent = "CHANGE CMS PASSWORD";
+        $(".modal__note").textContent = "This updates the password for the configured Supabase CMS account.";
+      }
       $("#pwModal").hidden = false;
       setTimeout(function () { $("#pwNew").focus(); }, 50);
     });
@@ -752,7 +835,7 @@
       api("/api/password", { body: { password: a } }).then(function (r) {
         if (r.status === 200 && r.json.ok) {
           closePw();
-          toast("SET PASSWORD UPDATED — MASTER KEY UNCHANGED", "ok");
+          toast(state.mode === "supabase" ? "SUPABASE PASSWORD UPDATED" : "SET PASSWORD UPDATED — MASTER KEY UNCHANGED", "ok");
         } else if (r.status === 401) {
           closePw();
           toast("SESSION EXPIRED — LOG IN AGAIN", "warn");
@@ -760,7 +843,7 @@
         } else {
           $("#pwErr").textContent = ((r.json && r.json.error) || "FAILED").toUpperCase();
         }
-      }).catch(function () { $("#pwErr").textContent = "SERVER UNREACHABLE."; });
+      }).catch(function (error) { $("#pwErr").textContent = (error.message || "SERVER UNREACHABLE").toUpperCase(); });
     });
     [$("#pwNew"), $("#pwNew2")].forEach(function (el) {
       el.addEventListener("keydown", function (e) { if (e.key === "Enter") $("#pwGo").click(); });
